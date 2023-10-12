@@ -78,11 +78,11 @@ end
 function load_rootpath(path)
     try
         return isdir(path) &&
-            hasreadperm(path) &&
-            path != "" &&
-            path != homedir() &&
-            !isjuliabasedir(path) &&
-            !has_too_many_files(path)
+               hasreadperm(path) &&
+               path != "" &&
+               path != homedir() &&
+               !isjuliabasedir(path) &&
+               !has_too_many_files(path)
     catch err
         is_walkdir_error(err) || rethrow()
         return false
@@ -145,7 +145,7 @@ function initialize_request(params::InitializeParams, server::LanguageServerInst
         if !(params.rootUri isa Nothing)
             push!(server.workspaceFolders, uri2filepath(params.rootUri))
         elseif !(params.rootPath isa Nothing)
-            push!(server.workspaceFolders,  params.rootPath)
+            push!(server.workspaceFolders, params.rootPath)
         end
     elseif (params.workspaceFolders !== nothing) & (params.workspaceFolders !== missing)
         for wksp in params.workspaceFolders
@@ -168,9 +168,9 @@ function initialize_request(params::InitializeParams, server::LanguageServerInst
     end
 
     if !ismissing(params.capabilities.workspace) &&
-        !ismissing(params.capabilities.workspace.didChangeConfiguration) &&
-        !ismissing(params.capabilities.workspace.didChangeConfiguration.dynamicRegistration) &&
-        params.capabilities.workspace.didChangeConfiguration.dynamicRegistration
+       !ismissing(params.capabilities.workspace.didChangeConfiguration) &&
+       !ismissing(params.capabilities.workspace.didChangeConfiguration.dynamicRegistration) &&
+       params.capabilities.workspace.didChangeConfiguration.dynamicRegistration
 
         server.clientcapability_workspace_didChangeConfiguration = true
     end

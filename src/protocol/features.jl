@@ -11,14 +11,14 @@ import Base.==
 ##############################################################################
 # Code Action
 const CodeActionKind = String
-const CodeActionKinds = (Empty = "",
-                         QuickFix = "quickfix",
-                         Refactor = "refactor",
-                         RefactorExtract = "refactor.extract",
-                         RefactorInline = "refactor.inline",
-                         RefactorRewrite = "refactor.rewrite",
-                         Source = "source",
-                         SourceOrganizeImports = "source.organizeImports")
+const CodeActionKinds = (Empty="",
+    QuickFix="quickfix",
+    Refactor="refactor",
+    RefactorExtract="refactor.extract",
+    RefactorInline="refactor.inline",
+    RefactorRewrite="refactor.rewrite",
+    Source="source",
+    SourceOrganizeImports="source.organizeImports")
 
 @dict_readable struct CodeActionKindCapabilities
     valueSet::Vector{CodeActionKind}
@@ -211,9 +211,9 @@ end
 ##############################################################################
 # Folding
 const FoldingRangeKind = String
-const FoldingRangeKinds = (Comment = "comment",
-                           Imports = "imports",
-                           Region = "region")
+const FoldingRangeKinds = (Comment="comment",
+    Imports="imports",
+    Region="region")
 
 @dict_readable struct FoldingRangeClientCapabilities <: Outbound
     dynamicRegistration::Union{Bool,Missing}

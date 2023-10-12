@@ -66,14 +66,14 @@ mutable struct LanguageServerInstance
 
     workspace::JuliaWorkspace
 
-    function LanguageServerInstance(@nospecialize(pipe_in), @nospecialize(pipe_out), env_path="", depot_path="", err_handler=nothing, symserver_store_path=nothing, download=true, symbolcache_upstream = nothing)
+    function LanguageServerInstance(@nospecialize(pipe_in), @nospecialize(pipe_out), env_path="", depot_path="", err_handler=nothing, symserver_store_path=nothing, download=true, symbolcache_upstream=nothing)
         new(
             JSONRPC.JSONRPCEndpoint(pipe_in, pipe_out, err_handler),
             Set{String}(),
             Dict{URI,Document}(),
             env_path,
             depot_path,
-            SymbolServer.SymbolServerInstance(depot_path, symserver_store_path; symbolcache_upstream = symbolcache_upstream),
+            SymbolServer.SymbolServerInstance(depot_path, symserver_store_path; symbolcache_upstream=symbolcache_upstream),
             Channel(Inf),
             StaticLint.ExternalEnv(deepcopy(SymbolServer.stdlibs), SymbolServer.collect_extended_methods(SymbolServer.stdlibs), collect(keys(SymbolServer.stdlibs))),
             Dict(),
@@ -184,7 +184,7 @@ function trigger_symbolstore_reload(server::LanguageServerInstance)
         ssi_ret, payload = SymbolServer.getstore(
             server.symbol_server,
             server.env_path,
-            function (msg, percentage = missing)
+            function (msg, percentage=missing)
                 if server.clientcapability_window_workdoneprogress && server.current_symserver_progress_token !== nothing
                     msg = ismissing(percentage) ? msg : string(msg, " ($percentage%)")
                     JSONRPC.send(
@@ -196,7 +196,7 @@ function trigger_symbolstore_reload(server::LanguageServerInstance)
                 @info msg
             end,
             server.err_handler,
-            download = server.symserver_use_download
+            download=server.symserver_use_download
         )
 
         server.number_of_outstanding_symserver_requests -= 1
@@ -272,7 +272,7 @@ end
 
 Run the language `server`.
 """
-function Base.run(server::LanguageServerInstance; timings = [])
+function Base.run(server::LanguageServerInstance; timings=[])
     did_show_timer = Ref(false)
     add_timer_message!(did_show_timer, timings, "LS startup started")
 
@@ -289,18 +289,18 @@ function Base.run(server::LanguageServerInstance; timings = [])
         add_timer_message!(did_show_timer, timings, "(async) listening to client events")
         while true
             msg = JSONRPC.get_next_message(server.jr_endpoint)
-            put!(server.combined_msg_queue, (type = :clientmsg, msg = msg))
+            put!(server.combined_msg_queue, (type=:clientmsg, msg=msg))
         end
     catch err
         bt = catch_backtrace()
         if server.err_handler !== nothing
             server.err_handler(err, bt)
         else
-            @warn "LS: An error occurred in the client listener task. This may be normal." exception=(err, bt)
+            @warn "LS: An error occurred in the client listener task. This may be normal." exception = (err, bt)
         end
     finally
         if isopen(server.combined_msg_queue)
-            put!(server.combined_msg_queue, (type = :close,))
+            put!(server.combined_msg_queue, (type=:close,))
             close(server.combined_msg_queue)
         end
         @debug "LS: Client listener task done."
@@ -312,18 +312,18 @@ function Base.run(server::LanguageServerInstance; timings = [])
         add_timer_message!(did_show_timer, timings, "(async) listening to symbol server events")
         while true
             msg = take!(server.symbol_results_channel)
-            put!(server.combined_msg_queue, (type = :symservmsg, msg = msg))
+            put!(server.combined_msg_queue, (type=:symservmsg, msg=msg))
         end
     catch err
         bt = catch_backtrace()
         if server.err_handler !== nothing
             server.err_handler(err, bt)
         else
-            @error "LS: Queue op failed" ex=(err, bt)
+            @error "LS: Queue op failed" ex = (err, bt)
         end
     finally
         if isopen(server.combined_msg_queue)
-            put!(server.combined_msg_queue, (type = :close,))
+            put!(server.combined_msg_queue, (type=:close,))
             close(server.combined_msg_queue)
         end
         @debug "LS: Symbol server listener task done."
